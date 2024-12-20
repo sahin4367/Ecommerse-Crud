@@ -35,18 +35,11 @@ const allCategories = async (req, res, next) => {
     res.json(categories)
 }
 
-const featuredCategories = async (req, res, next) => {
-    const categories = await Category.find()
-    const featuredCtrgy = await categories.filter(item => item.featured);
-    res.json(featuredCtrgy);
-}
-
 const CategoryEdit = async (req, res, next) => {
 
-    const {name, img, featured} = await Joi.object({
+    const {name, img} = await Joi.object({
         name: Joi.string().trim().min(3).max(50).required(),
         img: Joi.object(),
-        featured: Joi.boolean()
     }).validateAsync({
         ...req.body,
         img: req.file,
@@ -85,8 +78,7 @@ const bazadakiImgName = category.img_path?.split('-')[1];;
 
     const updateCategory = await Category.updateMany(
       { _id: req.params.id },
-      { name,
-        featured,}
+      { name,}
     );
 
     if (updateCategory.modifiedCount > 0 || (sonImgName !== bazadakiImgName)) {
@@ -116,7 +108,6 @@ const DeleteCategory = async (req, res, next) => {
 export const categoryContoller = () => ({
     create,
     allCategories,
-    featuredCategories,
     CategoryEdit,
     DeleteCategory
 })
