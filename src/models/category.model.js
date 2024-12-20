@@ -9,10 +9,7 @@ const categorySchema = new mongoose.Schema({
         type: String,
         default: null
     },
-    featured: {
-        type: Boolean,
-        default: false 
-    }
+
 })
 
 export const Category = mongoose.model("Category", categorySchema);

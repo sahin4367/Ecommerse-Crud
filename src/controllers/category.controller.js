@@ -5,10 +5,9 @@ import { Category } from "../models/category.model.js"
 
 const create = async (req, res, next) => {
 
-    const {name, img, featured} = await Joi.object({
+    const {name, img} = await Joi.object({
         name: Joi.string().trim().min(3).max(50).required(),
         img: Joi.object(),
-        featured: Joi.boolean()
     }).validateAsync({
         ...req.body,
         img: req.file,
@@ -20,18 +19,9 @@ const create = async (req, res, next) => {
             })
         })
 
-    if (featured) {
-            const featuredCount = await Category.countDocuments({ featured: true });
-            console.log(featuredCount)
-            if (featuredCount >= 5) {
-              return res.status(400).json({
-                message: 'Maksimum 6 featured kateqoriya ola bilər'
-              });}}
-
     const newCategory = await  Category.create({
         name,
         img_path: img?.filename ,
-        featured,
     }).then(newCategory => res.status(201).json(newCategory))
         .catch(error => res.status(500).json({
             message: "Xeta bash verdi!",
