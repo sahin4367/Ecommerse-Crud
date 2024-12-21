@@ -1,8 +1,7 @@
 import { Router } from "express"
-import { useAuth} from '../middlewares/auth.middleware.js'
+import { useAuth, userRole} from '../middlewares/auth.middleware.js'
 import { categoryContoller } from "../controllers/category.controller.js"
 import { uploads } from "../middlewares/muter.middleware.js"
-import { userRole } from "../middlewares/role.middleware.js"
 
 export const categoryRoutes = Router()
 const contoller = categoryContoller()
