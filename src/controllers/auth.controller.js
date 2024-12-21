@@ -1,5 +1,5 @@
 import Joi from "joi"
-import bcrypt from "bcrypt"
+import bcrypt from 'bcrypt';
 import { User } from "../models/user.model.js"
 import jwt from "jsonwebtoken"
 import { appConfig } from "../consts.js"
@@ -75,7 +75,7 @@ const login = async (req, res) => {
     }
 
     // 4. create jwt_token
-    const new_token = jwt.sign(jwt_payload, appConfig.JWT_SECRET, {
+    const new_token = jwt.sign(jwt_payload, process.env.JWT_SECRET, {
         algorithm: "HS256",
         expiresIn: "1d"
     })
