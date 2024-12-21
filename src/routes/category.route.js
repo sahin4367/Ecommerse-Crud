@@ -9,5 +9,7 @@ const contoller = categoryContoller()
 
 categoryRoutes.post("/create", useAuth, userRole, uploads.single('img'), contoller.create)
 categoryRoutes.get('/all', contoller.allCategories)
+categoryRoutes.get('/:id', contoller.getCategory)
+categoryRoutes.get('/featured', contoller.featuredCategories)
 categoryRoutes.patch('/edit/:id',useAuth, userRole, uploads.single('img'), contoller.CategoryEdit)
 categoryRoutes.delete('/delete/:id',useAuth, userRole, contoller.DeleteCategory)

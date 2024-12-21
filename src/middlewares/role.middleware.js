@@ -4,5 +4,4 @@ export const userRole = async (req, res, next) => {
     }
 
         next();
-
 }

@@ -5,9 +5,10 @@ import { Category } from "../models/category.model.js"
 
 const create = async (req, res, next) => {
 
-    const {name, img} = await Joi.object({
+    const {name, img, featured} = await Joi.object({
         name: Joi.string().trim().min(3).max(50).required(),
         img: Joi.object(),
+        featured: Joi.boolean()
     }).validateAsync({
         ...req.body,
         img: req.file,
@@ -19,9 +20,27 @@ const create = async (req, res, next) => {
             })
         })
 
+    if (featured) {
+            const featuredCount = await Category.countDocuments({ featured: true });
+            console.log(featuredCount)
+            if (featuredCount >= 5) {
+              return res.status(400).json({
+                message: 'Maksimum 6 featured kateqoriya ola bilər'
+              });}}
+
+const exsistCategory = await Category.findOne({
+    name: name,
+    });
+          
+     if (exsistCategory) {
+        return res.status(409).json({
+         message: "Bu category hal-hazirda movcuddur",
+    });
+              }
     const newCategory = await  Category.create({
         name,
         img_path: img?.filename ,
+        featured,
     }).then(newCategory => res.status(201).json(newCategory))
         .catch(error => res.status(500).json({
             message: "Xeta bash verdi!",
@@ -32,14 +51,47 @@ const create = async (req, res, next) => {
 const allCategories = async (req, res, next) => {
 
     const categories = await Category.find()
+    if (categories.length === 0) {
+        return res.status(404).json({
+          message: "Categoriyalar tapilmadi",
+        });}
     res.json(categories)
+}
+
+const getCategory = async (req, res, next) => {
+    try {
+      const id = req.params.id;
+  
+      const category = await Category.findById(id);
+  
+      if (!category) {
+        return res.status(400).json({
+          message: "Category tapilmadi",
+        });
+      }
+ 
+      res.status(200).json(category);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        message: "Server xetasi bas verdi",
+        error: error.message,
+      });
+    }
+  };  
+
+const featuredCategories = async (req, res, next) => {
+    const categories = await Category.find()
+    const featuredCtrgy = await categories.filter(item => item.featured);
+    res.json(featuredCtrgy);
 }
 
 const CategoryEdit = async (req, res, next) => {
 
-    const {name, img} = await Joi.object({
+    const {name, img, featured} = await Joi.object({
         name: Joi.string().trim().min(3).max(50).required(),
         img: Joi.object(),
+        featured: Joi.boolean()
     }).validateAsync({
         ...req.body,
         img: req.file,
@@ -78,7 +130,8 @@ const bazadakiImgName = category.img_path?.split('-')[1];;
 
     const updateCategory = await Category.updateMany(
       { _id: req.params.id },
-      { name,}
+      { name,
+        featured,}
     );
 
     if (updateCategory.modifiedCount > 0 || (sonImgName !== bazadakiImgName)) {
@@ -108,6 +161,8 @@ const DeleteCategory = async (req, res, next) => {
 export const categoryContoller = () => ({
     create,
     allCategories,
+    getCategory,
+    featuredCategories,
     CategoryEdit,
     DeleteCategory
 })
