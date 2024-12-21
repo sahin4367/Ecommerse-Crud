@@ -39,13 +39,35 @@ const exsistCategory = await Category.findOne({
 }
 
 const allCategories = async (req, res, next) => {
+try{
+const page = req.query.page || 1
+const limit = req.query.limit || 3
+const allCategories = await Category.countDocuments()
 
-    const categories = await Category.find()
-    if (categories.length === 0) {
-        return res.status(404).json({
-          message: "Categoriyalar tapilmadi",
-        });}
-    res.json(categories)
+if (allCategories.length === 0) {
+    return res.status(404).json({
+      message: "Categoriyalar tapilmadi",
+    });}
+
+const list = await Category.find().skip((page-1)*limit).limit(limit)
+
+res.status(200).json({
+status:true,
+data:list,
+pagination:{
+    allCategories,
+    currentpage:page,
+    categoryCount: list.length,
+    allPages:Math.ceil(allCategories/limit)
+}})
+}catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Server xetasi bas verdi",
+      error: error.message,
+    });
+  }
+
 }
 
 const getCategory = async (req, res, next) => {
@@ -69,8 +91,6 @@ const getCategory = async (req, res, next) => {
       });
     }
   };  
-
-
 
 const CategoryEdit = async (req, res, next) => {
 
