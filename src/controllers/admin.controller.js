@@ -16,7 +16,7 @@ const adminCreate = async (req, res, next) => {
 		surname: Joi.string().trim().min(3).max(12).required(),
 		email: Joi.string().email().required(),
 		password: Joi.string().trim().min(6).max(16).required(),
-		role: Joi.string().trim(),
+		role: Joi.string().trim().optional()
 	})
 		.validateAsync(req.body, { abortEarly: false })
 		.catch((err) => {
@@ -79,10 +79,36 @@ const adminEdit = async (req, res) => {
 	}
 };
 
+const adminRole=async(req,res,next)=>{
+	try {
+		const schemaRole = Joi.object({
+			role: Joi.string().trim().optional()
+		});
+		
+		const validData = await schemaRole.validateAsync(req.body);
+
+		const updatedRole = await User.findByIdAndUpdate(
+			req.params.id,
+			validData,
+			{ new: true }
+		);
+
+		res.json(updatedRole);
+	} catch (err) {
+		if (err.isJoi) {
+			return res.status(422).json({
+				message: error[422],
+			})
+		}
+		res.status(500).json({ message: error[500] });
+	}
+}
+
 
 
 
 export const AdminController = () => ({
 	adminCreate,
 	adminEdit,
+	adminRole,
 });
