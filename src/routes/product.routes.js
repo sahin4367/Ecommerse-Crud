@@ -4,8 +4,8 @@ import { useAuth, userRole } from "../middlewares/auth.middleware.js"
 import multer from "multer"
 
 export const productRoutes = Router()
-const contoller = ProductController()
+const controller = ProductController()
 
 const upload = multer();
 
-productRoutes.post("/create", useAuth, userRole, upload.none(), contoller.createProduct)
+productRoutes.post("/create", useAuth, userRole, upload.none(), controller.createProduct)

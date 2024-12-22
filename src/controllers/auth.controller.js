@@ -86,7 +86,7 @@ const login = async (req, res) => {
     })
 }
 
-export const AuthContoller = () => ({
+export const AuthController = () => ({
     login,
     register,
 })
