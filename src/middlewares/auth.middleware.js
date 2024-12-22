@@ -1,46 +1,51 @@
 import jwt from "jsonwebtoken";
-import 'dotenv/config';
+import "dotenv/config";
 import { appConfig } from "../consts.js";
 import { User } from "../models/user.model.js";
 
 export const useAuth = async (req, res, next) => {
-    if (!req.headers.authorization || !req.headers.authorization.startsWith("Bearer")) {
-        return res.status(401).json({
-            message: "Token tapilmadi"
-        })
-    }
+  if (
+    !req.headers.authorization ||
+    !req.headers.authorization.startsWith("Bearer")
+  ) {
+    return res.status(401).json({
+      message: "Token tapilmadi",
+    });
+  }
 
-    const access_token = req.headers.authorization.split(" ")[1];
-    if (!access_token) return res.status(401).json({
-        message: "Token tapilmadi"
-    })
+  const access_token = req.headers.authorization.split(" ")[1];
+  if (!access_token)
+    return res.status(401).json({
+      message: "Token tapilmadi",
+    });
 
-    try {
-        const jwtResult = jwt.verify(access_token, appConfig.JWT_SECRET)
+  try {
+    const jwtResult = jwt.verify(access_token, appConfig.JWT_SECRET);
 
-        const user = await User.findById(jwtResult.sub).select("_id email name surname role")
-        if (!user) return res.status(401).json({ message: "User not found!" });
+    const user = await User.findById(jwtResult.sub).select(
+      "_id email name surname role"
+    );
+    if (!user) return res.status(401).json({ message: "User not found!" });
 
-        req.user = user;
+    req.user = user;
 
-        next();
-
-    } catch (error) {
-        return res.status(500).json({
-            message: error.message,
-            error,
-        })
-    }
-}
-
-export const roleCheck = (allowedRoles) => {
-    return (req, res, next) => {
-        const userRole = req.user.role; 
-
-        if (!allowedRoles.includes(userRole)) {
-            return res.status(403).json({ message: "Giriş icazəniz yoxdur!" });
-        }
-        
-        next();
+    next();
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+      error,
+    });
+  }
 };
+
+export const roleCheck = (role) => {
+  return (req, res, next) => {
+    const userRole = req.user.role;
+
+    if (!role.includes(userRole)) {
+      return res.status(403).json({ message: "Giriş icazəniz yoxdur!" });
+    }
+
+    next();
+  };
 };
