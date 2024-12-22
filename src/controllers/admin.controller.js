@@ -56,10 +56,10 @@ const adminEdit = async (req, res) => {
     }
 
     const schema = Joi.object({
-      name: Joi.string().trim().min(3).max(12).required(),
-      surname: Joi.string().trim().min(3).max(12).required(),
-      email: Joi.string().email().required(),
-    });
+      name: Joi.string().trim().min(3).max(12),
+      surname: Joi.string().trim().min(3).max(12),
+      email: Joi.string().email(),
+    }).xor("name", "surname", "email");
 
     const validData = await schema.validateAsync(req.body, {
       abortEarly: false,
