@@ -1,4 +1,5 @@
 export const appConfig = {
-    MONGO_URL: process.env.URL,
-    JWT_SECRET: process.env.JWTSECRET,
+    PORT:process.env.PORT,
+    MONGO_URL: process.env.MONGO_URL,
+    JWT_SECRET: process.env.JWT_SECRET,
 }
