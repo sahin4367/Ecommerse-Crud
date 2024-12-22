@@ -33,11 +33,14 @@ export const useAuth = async (req, res, next) => {
     }
 }
 
-export const userRole = async (req, res, next) => {
+export const roleCheck = (allowedRoles) => {
+    return (req, res, next) => {
+        const userRole = req.user.role; 
 
-    if (req.user.role !== "super admin") {
-        return res.status(403).json("Siz admin deyilsiniz.")
-    }
-    
-    next();
-}
+        if (!allowedRoles.includes(userRole)) {
+            return res.status(403).json({ message: "Giriş icazəniz yoxdur!" });
+        }
+        
+        next();
+};
+};
