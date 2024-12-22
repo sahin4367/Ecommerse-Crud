@@ -1,6 +1,6 @@
 import { Router } from "express"
 import { AdminController } from "../controllers/admin.controller.js"
-import {  useAuth,  } from "../middlewares/auth.middleware.js"
+import {  roleCheck, useAuth,  } from "../middlewares/auth.middleware.js"
 
 export const adminRoutes = Router()
 const contoller = AdminController()
