@@ -57,11 +57,8 @@ const login = async (req, res) => {
     const user = await User.findOne({
         email: validData.email,
     })
-    if (!user) {
-        return res.status(401).json({
-            message: "Email ve ya shifre sehvdir!"
-        })
-    }
+    if (!user) return res.status(401).json({message: "Email ve ya shifre sehvdir!"})
+    
 
     // 3. Check password
     const isValidPassword = await bcrypt.compare(validData.password, user.password)
