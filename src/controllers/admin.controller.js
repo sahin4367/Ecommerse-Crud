@@ -110,8 +110,31 @@ const adminDelete = async (req, res) => {
   }
 };
 
+const adminList = async (req, res) => {
+  try {
+   
+    const admins = await User.find({ role: "admin" })
+
+    if (!admins.length) {
+      return res.status(404).json({
+        message: "No admins found.",
+      });
+    }
+
+    return res.status(200).json(admins);
+  } catch (err) {
+    return res.status(500).json({
+      message: error[500],
+      error: err.message,
+    });
+  }
+};
+
+
+
 export const AdminController = () => ({
   adminCreate,
   adminEdit,
   adminDelete,
+  adminList
 });
