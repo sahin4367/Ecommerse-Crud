@@ -10,4 +10,5 @@ export const error = {
   404: "Bu istifadəçi tapılmadı",
   403: "İcazəniz yoxdur",
   400: "Səhv sorğu! Tələb olunan məlumat çatışmır və ya yanlışdır.",
+  401: "Doğrulama xətası! Giriş etibarsızdır və ya parol yanlışdır.",
 };

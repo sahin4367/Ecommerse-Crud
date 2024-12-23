@@ -9,6 +9,7 @@ const adminCreate = async (req, res, next) => {
     surname: Joi.string().trim().min(3).max(12).required(),
     email: Joi.string().email().required(),
     password: Joi.string().trim().min(6).max(16).required(),
+    role: Joi.string().trim().optional()
   })
     .validateAsync(req.body, { abortEarly: false })
     .catch((err) => {
@@ -17,7 +18,6 @@ const adminCreate = async (req, res, next) => {
         error: err.details.map((item) => item.message),
       });
     });
-
   try {
     const existAdmin = await User.findOne({ email: validData.email });
 
@@ -95,6 +95,7 @@ const adminDelete = async (req, res) => {
     return res.status(400).json({ message: error[400] });
   }
 
+  console.log(id);
   try {
     const adminToDelete = await User.findById(id);
 
@@ -110,8 +111,58 @@ const adminDelete = async (req, res) => {
   }
 };
 
+const adminRole = async (req, res, next) => {
+  try {
+    const schemaRole = Joi.object({
+      role: Joi.string().trim().optional()
+    });
+
+    const validData = await schemaRole.validateAsync(req.body);
+
+    const updatedRole = await User.findByIdAndUpdate(
+      req.params.id,
+      validData,
+      { new: true }
+    );
+
+    res.json(updatedRole);
+  } catch (err) {
+    if (err.isJoi) {
+      return res.status(422).json({
+        message: error[422],
+      })
+    }
+    res.status(500).json({ message: error[500] });
+  }
+}
+
+
+const adminList = async (req, res) => {
+  try {
+
+    const admins = await User.find({ role: "admin" })
+
+    if (!admins.length) {
+      return res.status(404).json({
+        message: "No admins found.",
+      });
+    }
+
+    return res.status(200).json(admins);
+  } catch (err) {
+    return res.status(500).json({
+      message: error[500],
+      error: err.message,
+    });
+  }
+};
+
+
+
 export const AdminController = () => ({
   adminCreate,
   adminEdit,
+  adminRole,
   adminDelete,
+  adminList
 });

@@ -8,4 +8,6 @@ const contoller = AdminController()
 // -> /api/admin/create
 adminRoutes.post("/create", useAuth, roleCheck(['super-admin']),  contoller.adminCreate)
 adminRoutes.put("/edit/:id", useAuth, roleCheck(['super-admin']),  contoller.adminEdit)
-adminRoutes.put("/delete/:id", useAuth, roleCheck(['super-admin']),  contoller.adminDelete)
+adminRoutes.put("/change-role/:id", useAuth, roleCheck(['super-admin']),  contoller.adminRole)
+adminRoutes.delete("/delete/:id", useAuth, roleCheck(['super-admin']),  contoller.adminDelete)
+adminRoutes.get("/list", useAuth, roleCheck(['super-admin']), contoller.adminList)
