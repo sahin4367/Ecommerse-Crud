@@ -16,6 +16,6 @@ monngose.connect(appConfig.MONGO_URL).then(() => {
     console.error("Error connecting to MongoDB", err);
 });
 
-app.listen(8080, () => {
+app.listen(appConfig.PORT, () => {
     console.log("Server is running on port 8080");
 });
