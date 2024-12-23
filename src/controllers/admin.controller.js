@@ -43,17 +43,10 @@ const adminCreate = async (req, res, next) => {
 };
 
 const adminEdit = async (req, res) => {
-  const { id } = req.params;
-  if (!id) {
-    return res.status(400).json({ message: error[400] });
-  }
+ 
 
   try {
-    const adminToEdit = await User.findById(id);
 
-    if (!adminToEdit) {
-      return res.status(404).json({ message: error[404] });
-    }
 
     const schema = Joi.object({
       name: Joi.string().trim().min(3).max(12),
@@ -89,21 +82,10 @@ const adminEdit = async (req, res) => {
   }
 };
 const adminDelete = async (req, res) => {
-  const { id } = req.params;
-
-  if (!id) {
-    return res.status(400).json({ message: error[400] });
-  }
-
-  console.log(id);
+ 
   try {
-    const adminToDelete = await User.findById(id);
 
-    if (!adminToDelete) {
-      return res.status(404).json({ message: error[404] });
-    }
-
-    await User.deleteOne({ _id: id });
+    await User.deleteOne({ _id });
 
     return res.json({ message: "Admin uğurla silindi." });
   } catch (err) {

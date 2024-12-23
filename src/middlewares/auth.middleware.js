@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import "dotenv/config";
-import { appConfig } from "../consts.js";
+import { appConfig, error } from "../consts.js";
 import { User } from "../models/user.model.js";
 
 export const useAuth = async (req, res, next) => {
@@ -43,9 +43,29 @@ export const roleCheck = (role) => {
     const userRole = req.user.role;
 
     if (!role.includes(userRole)) {
-      return res.status(403).json({ message: "Giriş icazəniz yoxdur!" });
+      return res.status(403).json({ message: error[403] });
     }
 
     next();
   };
 };
+
+export const idCheck=async(req,res,next)=>{
+ try {
+  const { id } = req.params;
+  if (!id) {
+    return res.status(400).json({ message: error[400] });
+  }
+  const adminToEdit = await User.findById(id);
+
+  if (!adminToEdit) {
+    return res.status(404).json({ message: error[404] });
+  }
+  next()
+ } catch (error) {
+  return res.status(500).json({
+    message: error.message,
+    error,
+  });
+ }
+}
