@@ -43,17 +43,9 @@ const adminCreate = async (req, res, next) => {
 };
 
 const adminEdit = async (req, res) => {
-  const { id } = req.params;
-  if (!id) {
-    return res.status(400).json({ message: error[400] });
-  }
-
+ 
   try {
-    const adminToEdit = await User.findById(id);
-
-    if (!adminToEdit) {
-      return res.status(404).json({ message: error[404] });
-    }
+    
 
     const schema = Joi.object({
       name: Joi.string().trim().min(3).max(12),
@@ -64,13 +56,10 @@ const adminEdit = async (req, res) => {
     const validData = await schema.validateAsync(req.body, {
       abortEarly: false,
     });
-    const name = validData.name || adminToEdit.name;
-    const email = validData.email || adminToEdit.email;
-    const surname = validData.surname || adminToEdit.surname;
-
+    
     const updatedAdmin = await User.findByIdAndUpdate(
-      id,
-      { ...validData, name, surname, email },
+      req.params.id,
+      { ...validData },
       {
         new: true,
         runValidators: true,
