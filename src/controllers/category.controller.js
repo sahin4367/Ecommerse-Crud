@@ -164,7 +164,7 @@ const DeleteCategory = async (req, res, next) => {
 }
 
 
-export const categoryContoller = () => ({
+export const categoryController = () => ({
   create,
   allCategories,
   getCategory,

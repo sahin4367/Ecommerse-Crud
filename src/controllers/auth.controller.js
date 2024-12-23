@@ -132,8 +132,8 @@ const resetPass = async (req, res) => {
   }
 };
 
-export const AuthContoller = () => ({
-  login,
-  register,
-  resetPass,
-});
+export const AuthController = () => ({
+    login,
+    register,
+    resetPass,
+})
