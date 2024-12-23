@@ -1,114 +1,168 @@
 import Joi from "joi";
 import { User } from "../models/user.model.js";
 import bcrypt from "bcrypt";
-const error = {
-	422: "Validasiya Xətası!",
-	409: "Bu istifadəçi artıq mövcuddur!",
-	500: "Server xətası!",
-	404: "Bu istifadəçi tapılmadı",
-	403: "İcazəniz yoxdur"
-};
+import { error } from "../consts.js";
 
 const adminCreate = async (req, res, next) => {
+  const validData = await Joi.object({
+    name: Joi.string().trim().min(3).max(12).required(),
+    surname: Joi.string().trim().min(3).max(12).required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().trim().min(6).max(16).required(),
+    role: Joi.string().trim().optional()
+  })
+    .validateAsync(req.body, { abortEarly: false })
+    .catch((err) => {
+      return res.status(422).json({
+        message: error[422],
+        error: err.details.map((item) => item.message),
+      });
+    });
+  try {
+    const existAdmin = await User.findOne({ email: validData.email });
 
-	const validData = await Joi.object({
-		name: Joi.string().trim().min(3).max(12).required(),
-		surname: Joi.string().trim().min(3).max(12).required(),
-		email: Joi.string().email().required(),
-		password: Joi.string().trim().min(6).max(16).required(),
-		role: Joi.string().trim().optional()
-	})
-		.validateAsync(req.body, { abortEarly: false })
-		.catch((err) => {
-			return res.status(422).json({
-				message: error[422],
-				error: err.details.map((item) => item.message),
-			});
-		});
+    if (existAdmin)
+      return res.status(409).json({
+        message: error[409],
+      });
+    validData.password = await bcrypt.hash(validData.password, 10);
 
-	validData.role = "admin";
+    const newAdmin = new User({
+      ...validData,
+      role: "admin",
+    });
+    await newAdmin.save();
 
-	try {
-		const existAdmin = await User.findOne({ email: validData.email });
-
-		if (existAdmin)
-			return res.status(409).json({
-				message: error[409],
-			});
-		validData.password = await bcrypt.hash(validData.password, 10);
-
-		const newAdmin = await User.create(validData);
-
-		return res.json(newAdmin);
-	} catch (err) {
-		return res.status(500).json({
-			message: error[500],
-		});
-	}
+    return res.status(201).json(newAdmin);
+  } catch (err) {
+    return res.status(500).json({
+      message: error[500],
+      error: err.message,
+    });
+  }
 };
 
 const adminEdit = async (req, res) => {
-	try {
-		const adminToEdit = await User.findById(req.params.id);
-		
-		if (!adminToEdit) {
-			return res.status(404).json({ message: error[404] });
-		}
-		const schema = Joi.object({
-			name: Joi.string().trim().min(3).max(12).required(),
-			surname: Joi.string().trim().min(3).max(12).required(),
-			email: Joi.string().email().required(),
-		});
-		
-		const validData = await schema.validateAsync(req.body, { abortEarly: false });
+  const { id } = req.params;
+  if (!id) {
+    return res.status(400).json({ message: error[400] });
+  }
 
-		const updatedAdmin = await User.findByIdAndUpdate(
-			req.params.id,
-			validData,
-			{ new: true }
-		);
+  try {
+    const adminToEdit = await User.findById(id);
 
-		res.json(updatedAdmin);
-	} catch (err) {
-		if (err.isJoi) {
-			return res.status(422).json({
-				message: error[422],
-			})
-		}
-		res.status(500).json({ message: error[500] });
-	}
+    if (!adminToEdit) {
+      return res.status(404).json({ message: error[404] });
+    }
+
+    const schema = Joi.object({
+      name: Joi.string().trim().min(3).max(12).required(),
+      surname: Joi.string().trim().min(3).max(12).required(),
+      email: Joi.string().email().required(),
+    });
+
+    const validData = await schema.validateAsync(req.body, {
+      abortEarly: false,
+    });
+
+    const updatedAdmin = await User.findByIdAndUpdate(id, validData, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updatedAdmin) {
+      return res.status(500).json({ message: error[500] });
+    }
+
+    return res.status(200).json(updatedAdmin);
+  } catch (err) {
+    if (err.isJoi) {
+      return res.status(422).json({
+        message: error[422],
+        errors: err.details.map((item) => item.message),
+      });
+    }
+    return res.status(500).json({
+      message: error[500],
+      error: err.message,
+    });
+  }
+};
+const adminDelete = async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(400).json({ message: error[400] });
+  }
+
+  console.log(id);
+  try {
+    const adminToDelete = await User.findById(id);
+
+    if (!adminToDelete) {
+      return res.status(404).json({ message: error[404] });
+    }
+
+    await User.deleteOne({ _id: id });
+
+    return res.json({ message: "Admin uğurla silindi." });
+  } catch (err) {
+    return res.status(500).json({ message: error[500], error: err.message });
+  }
 };
 
-const adminRole=async(req,res,next)=>{
-	try {
-		const schemaRole = Joi.object({
-			role: Joi.string().trim().optional()
-		});
-		
-		const validData = await schemaRole.validateAsync(req.body);
+const adminRole = async (req, res, next) => {
+  try {
+    const schemaRole = Joi.object({
+      role: Joi.string().trim().optional()
+    });
 
-		const updatedRole = await User.findByIdAndUpdate(
-			req.params.id,
-			validData,
-			{ new: true }
-		);
+    const validData = await schemaRole.validateAsync(req.body);
 
-		res.json(updatedRole);
-	} catch (err) {
-		if (err.isJoi) {
-			return res.status(422).json({
-				message: error[422],
-			})
-		}
-		res.status(500).json({ message: error[500] });
-	}
+    const updatedRole = await User.findByIdAndUpdate(
+      req.params.id,
+      validData,
+      { new: true }
+    );
+
+    res.json(updatedRole);
+  } catch (err) {
+    if (err.isJoi) {
+      return res.status(422).json({
+        message: error[422],
+      })
+    }
+    res.status(500).json({ message: error[500] });
+  }
 }
 
+
+const adminList = async (req, res) => {
+  try {
+
+    const admins = await User.find({ role: "admin" })
+
+    if (!admins.length) {
+      return res.status(404).json({
+        message: "No admins found.",
+      });
+    }
+
+    return res.status(200).json(admins);
+  } catch (err) {
+    return res.status(500).json({
+      message: error[500],
+      error: err.message,
+    });
+  }
+};
 
 
 
 export const AdminController = () => ({
-	adminCreate,
-	adminEdit,
-	adminRole,
+  adminCreate,
+  adminEdit,
+  adminRole,
+  adminDelete,
+  adminList
 });
