@@ -30,9 +30,23 @@ const create = async (req, res, next) => {
 };
 
 const alllist = async (req, res, next) => {
-    const categories = await Category.find();
-    res.json(categories);
+    //pagination hissesi  :::
+    const page = req.query.page || 1
+    const limit = req.query.limit || 3
+    const totalCateqories = await Category.countDocuments()
+
+    const categories = await Category.find().skip((page-1)*limit).limit(limit);
+    res.status(200).json({
+        status : true,
+        data : categories,
+        pagination : {
+            totalCateqories : totalCateqories,
+            currentpage : page,
+            countpageCateqor : Math.ceil(totalCateqories/limit)
+        }
+    });    
 };
+
 
 const updateCateqory = async (req, res, next) => {
     try {
