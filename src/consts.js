@@ -2,6 +2,9 @@ export const appConfig = {
   PORT: process.env.PORT,
   MONGO_URL: process.env.MONGO_URL,
   JWT_SECRET: process.env.JWT_SECRET,
+  USER_EMAIL : process.env.EMAIL,
+  USER_PASSWORD : process.env.PASSWORD, 
+  // CODEEXPIREAT: new Date(Date.now() - 3 * 60 * 1000); //evvl 3 minut idi
 };
 export const error = {
   422: "Validasiya Xətası!",

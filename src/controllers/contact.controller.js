@@ -25,11 +25,11 @@ const create = async (req, res, next) => {
     email: data.email,
   });
 
-  if (!existMail) {
-    return res.status(409).json({
-      message: "Bu email-ə uygun user movcud deyil",
-    });
-  }
+  // if (!existMail) {
+  //   return res.status(409).json({
+  //     message: "Bu email-ə uygun user movcud deyil",
+  //   });
+  // }
   const newMessage = await Contact.create({
     name: data.name,
     email: data.email,

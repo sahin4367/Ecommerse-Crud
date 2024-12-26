@@ -51,7 +51,7 @@ export const roleCheck = (role) => {
 };
 
 export const idCheck=async(req,res,next)=>{
- try {
+  try {
   const { id } = req.params;
   if (!id) {
     return res.status(400).json({ message: error[400] });

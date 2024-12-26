@@ -43,7 +43,7 @@ const adminCreate = async (req, res, next) => {
 };
 
 const adminEdit = async (req, res) => {
- 
+
   try {
     
 
@@ -85,7 +85,7 @@ const adminEdit = async (req, res) => {
   }
 };
 const adminDelete = async (req, res) => {
- 
+
   try {
 
     await User.deleteOne({ _id });

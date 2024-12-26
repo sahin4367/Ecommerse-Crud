@@ -132,6 +132,7 @@ const resetPass = async (req, res) => {
   }
 };
 
+
 export const AuthController = () => ({
     login,
     register,

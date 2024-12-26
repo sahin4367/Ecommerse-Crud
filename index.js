@@ -17,5 +17,5 @@ monngose.connect(appConfig.MONGO_URL).then(() => {
 });
 
 app.listen(appConfig.PORT, () => {
-    console.log("Server is running on port 8080");
+    console.log("Server is running on port 6000");
 });
